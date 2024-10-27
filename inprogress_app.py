@@ -34,8 +34,13 @@ app_ui = ui.page_fluid(
                 ui.sidebar(
                     ui.input_slider("selected_number_of_bins1", "Number of Bins (Flipper Length)", 1, 50, 20),  # Adjusted range for better binning
                     ui.tags.hr(),
-                    ui.input_checkbox_group("multi_choice_input", "Select One or More Penguin Species to Display:", 
-                                            choices=["Adelie", "Chinstrap", "Gentoo"]),  # Checkbox group for species
+                    ui.input_checkbox_group(
+                        "multi_choice_input",
+                        "Select One or More Penguin Species to Display:", 
+                        choices=["Adelie", "Chinstrap", "Gentoo"],  # Checkbox group for species
+                        selected=["Adelie", "Chinstrap", "Gentoo"],
+                        inline=False,
+                    ),
                     bg="#F6FFF8"
                 ),
                 ui.output_plot("penguin_flipper_histogram")
