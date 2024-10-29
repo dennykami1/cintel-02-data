@@ -7,7 +7,7 @@ import palmerpenguins  # This Package Provides the Palmer Penguin Dataset
 # Load the Palmer Penguins dataset
 penguins_df = palmerpenguins.load_penguins()
 
-app_ui = ui.page_fluid(
+app_ui = ui.page_fluid(                
     ui.tags.head(
         ui.tags.style(""" 
             .title-box {
@@ -29,39 +29,41 @@ app_ui = ui.page_fluid(
             class_="title-box"
         ),
         ui.page_fillable(
-            ui.card(
-                ui.card_header("Histogram of Flipper Length from Palmer Penguins Dataset"),
-                ui.layout_sidebar(
-                    ui.sidebar(
-                        ui.input_slider("selected_number_of_bins1", "Number of Bins (Flipper Length)", 1, 50, 20),
-                        ui.tags.hr(),
-                        ui.input_checkbox_group(
-                            "multi_choice_input",
-                            "Select One or More Penguin Species to Display:", 
-                            choices=["Adelie", "Chinstrap", "Gentoo"],
-                            selected=["Adelie", "Chinstrap", "Gentoo"],
-                            inline=False,
+            ui.layout_columns(
+                ui.card(
+                    ui.card_header("Histogram of Flipper Length from Palmer Penguins Dataset"),
+                    ui.layout_sidebar(
+                        ui.sidebar(
+                            ui.input_slider("selected_number_of_bins1", "Number of Bins (Flipper Length)", 1, 50, 20),
+                            ui.tags.hr(),
+                            ui.input_checkbox_group(
+                                "multi_choice_input",
+                                "Select One or More Penguin Species to Display:", 
+                                choices=["Adelie", "Chinstrap", "Gentoo"],
+                                selected=["Adelie", "Chinstrap", "Gentoo"],
+                                inline=False,
+                            ),
+                            bg="#F6FFF8"
                         ),
-                        bg="#F6FFF8"
+                        ui.output_plot("penguin_flipper_histogram")
                     ),
-                    ui.output_plot("penguin_flipper_histogram")
+                    full_screen=True  # Make inner card full-screen width
                 ),
-                full_screen=True  # Make inner card full-screen width
+                ui.card(
+                    ui.card_header("Histogram of Body Mass from Palmer Penguins Dataset"),
+                    ui.layout_sidebar(
+                        ui.sidebar(
+                            ui.input_slider("selected_number_of_bins2", "Number of Bins (Body Mass)", 1, 50, 20),
+                            bg="#F6FFF8"
+                        ),
+                        ui.output_plot("penguin_body_mass_histogram")
+                    ),
+                    full_screen=True  # Make inner card full-screen width
+                )
             ),
-            ui.card(
-                ui.card_header("Histogram of Body Mass from Palmer Penguins Dataset"),
-                ui.layout_sidebar(
-                    ui.sidebar(
-                        ui.input_slider("selected_number_of_bins2", "Number of Bins (Body Mass)", 1, 50, 20),
-                        bg="#F6FFF8"
-                    ),
-                    ui.output_plot("penguin_body_mass_histogram")
-                ),
-                full_screen=True  # Make inner card full-screen width
-            )
-        ),
-        full_screen=True,  # Outer card full-screen width
-        style="padding: 20px;"
+            full_screen=True,  # Outer card full-screen width
+            style="padding: 20px;"
+        )
     ),
     theme=shinyswatch.theme.minty
 )
