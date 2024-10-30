@@ -7,31 +7,37 @@ import palmerpenguins  # This Package Provides the Palmer Penguin Dataset
 # Load the Palmer Penguins dataset
 penguins_df = palmerpenguins.load_penguins()
 
-app_ui = ui.page_fluid(                
+app_ui = ui.page_fluid(
     ui.tags.head(
         ui.tags.style(""" 
             .title-box {
-                background-color: #A4C3B2;
+                background-color: #A4C8E1; /* Title box color */
                 border: 1px solid #ccc;
                 padding: 10px;
                 text-align: center;
                 font-family: 'Arial', sans-serif;
-                font-size: 20px;
-                color: #000000;
-                margin-bottom: 20px;
+                font-size: 15px;
+                color: #333;
+                margin-bottom: 5px;
                 border-radius: 9px;
+            }
+            /* Custom styling for the DataFrame header */
+            .dataframe-header th {
+                background-color: #A4C8E1; /* Light blue for header */
+                color: #333; /* Text color for header */
             }
         """)
     ),
     ui.card(  # Outer card to encapsulate everything
         ui.div(
-            ui.panel_title("Kami's take on the PyShiny App with Palmer Penguins Histograms"),
+            ui.h2("Kami's take on the PyShiny App with Palmer Penguins Histograms"),
             class_="title-box"
         ),
         ui.page_fillable(
             ui.layout_columns(
+                # Card for Histogram of Flipper Length
                 ui.card(
-                    ui.card_header("Histogram of Flipper Length from Palmer Penguins Dataset"),
+                    ui.card_header("Histogram of Flipper Length from Palmer Penguins Dataset", style="background-color: #A4C8E1; color: #333;"),
                     ui.layout_sidebar(
                         ui.sidebar(
                             ui.input_slider("selected_number_of_bins1", "Number of Bins (Flipper Length)", 1, 50, 20),
@@ -43,29 +49,36 @@ app_ui = ui.page_fluid(
                                 selected=["Adelie", "Chinstrap", "Gentoo"],
                                 inline=False,
                             ),
-                            bg="#F6FFF8"
+                            bg="#edf6f9"
                         ),
                         ui.output_plot("penguin_flipper_histogram")
                     ),
                     full_screen=True  # Make inner card full-screen width
                 ),
+                # Card for Histogram of Body Mass
                 ui.card(
-                    ui.card_header("Histogram of Body Mass from Palmer Penguins Dataset"),
+                    ui.card_header("Histogram of Body Mass from Palmer Penguins Dataset", style="background-color: #A4C8E1; color: #333;"),
                     ui.layout_sidebar(
                         ui.sidebar(
                             ui.input_slider("selected_number_of_bins2", "Number of Bins (Body Mass)", 1, 50, 20),
-                            bg="#F6FFF8"
+                            bg="#edf6f9"
                         ),
                         ui.output_plot("penguin_body_mass_histogram")
                     ),
                     full_screen=True  # Make inner card full-screen width
-                )
+                ),
             ),
-            full_screen=True,  # Outer card full-screen width
-            style="padding: 20px;"
-        )
+            # Card for Palmer Penguins Data Frame
+            ui.card(
+                ui.card_header("Palmer Penguins Data Frame", style="background-color: #A4C8E1; color: #333;"),
+                ui.output_data_frame("penguins_data_frame"),  # Removed css_class argument
+                full_screen=True,  # Outer card full-screen width
+            )
+        ),
+        full_screen=True,  # Outer card full-screen width
+        style="padding: 20px;"
     ),
-    theme=shinyswatch.theme.minty
+    theme=shinyswatch.theme.lumen
 )
 
 def server(input: Inputs, output: Outputs, session: Session):
@@ -76,7 +89,7 @@ def server(input: Inputs, output: Outputs, session: Session):
         selected_species = input.multi_choice_input()
         filtered_data = penguins_df[penguins_df['species'].isin(selected_species)] if selected_species else penguins_df
 
-        colors = {"Adelie": "#6B9080", "Chinstrap": "#D95B43", "Gentoo": "#F1C40F"}
+        colors = {"Adelie": "#386fa4", "Chinstrap": "#662e9b", "Gentoo": "#469d89"}
         for species in selected_species:
             species_data = filtered_data[filtered_data['species'] == species]['flipper_length_mm'].dropna()
             plt.hist(species_data, bins=input.selected_number_of_bins1(), 
@@ -101,5 +114,11 @@ def server(input: Inputs, output: Outputs, session: Session):
         plt.xlabel("Body Mass (g)")
         plt.ylabel("Density")
         plt.title("Histogram of Body Mass from Palmer Penguins Dataset")
+    
+    # Render the penguins data as a DataFrame
+    @output
+    @render.data_frame
+    def penguins_data_frame():
+        return penguins_df
 
 app = App(app_ui, server)
