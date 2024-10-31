@@ -5,7 +5,7 @@ import shinyswatch
 import palmerpenguins  # This Package Provides the Palmer Penguin Dataset
 
 # Load the Palmer Penguins dataset
-penguins_df = palmerpenguins.load_penguins()
+penguins = palmerpenguins.load_penguins()
 
 app_ui = ui.page_fluid(
     ui.tags.head(
@@ -70,8 +70,26 @@ app_ui = ui.page_fluid(
             ),
             # Card for Palmer Penguins Data Frame
             ui.card(
-                ui.card_header("Palmer Penguins Data Frame", style="background-color: #A4C8E1; color: #333;"),
-                ui.output_data_frame("penguins_data_frame"),  # Removed css_class argument
+                ui.card_header("Palmer Penguins Data Frame & Data Grid", style="background-color: #A4C8E1; color: #333;"),
+                ui.layout_columns(
+                    # Column for Data Frame
+                    ui.card(
+                        ui.column(
+                            11, 
+                            ui.h2("Data Frame"),
+                            ui.output_data_frame("penguins_df"),
+                        ),
+                    ),
+                    # Column for Data Table
+                    ui.card(
+                        ui.column(
+                            11,  
+                            ui.h2("Data Table"),
+                            ui.output_data_frame("penguins_dt"),
+                        
+                        ),
+                    ),   
+                ),
                 full_screen=True,  # Outer card full-screen width
             )
         ),
@@ -87,7 +105,7 @@ def server(input: Inputs, output: Outputs, session: Session):
     def penguin_flipper_histogram():
         plt.clf()
         selected_species = input.multi_choice_input()
-        filtered_data = penguins_df[penguins_df['species'].isin(selected_species)] if selected_species else penguins_df
+        filtered_data = penguins[penguins['species'].isin(selected_species)] if selected_species else penguins
 
         colors = {"Adelie": "#386fa4", "Chinstrap": "#662e9b", "Gentoo": "#469d89"}
         for species in selected_species:
@@ -106,7 +124,7 @@ def server(input: Inputs, output: Outputs, session: Session):
     def penguin_body_mass_histogram():
         plt.clf()
         selected_species = input.multi_choice_input()
-        filtered_data = penguins_df[penguins_df['species'].isin(selected_species)] if selected_species else penguins_df
+        filtered_data = penguins[penguins['species'].isin(selected_species)] if selected_species else penguins
         
         plt.hist(filtered_data['body_mass_g'].dropna(), 
                  bins=input.selected_number_of_bins2(), density=True, 
@@ -118,7 +136,12 @@ def server(input: Inputs, output: Outputs, session: Session):
     # Render the penguins data as a DataFrame
     @output
     @render.data_frame
-    def penguins_data_frame():
-        return penguins_df
+    def penguins_df():
+        return render.DataGrid(penguins)
+
+    @output
+    @render.data_frame  
+    def penguins_dt():
+        return render.DataTable(penguins) 
 
 app = App(app_ui, server)
